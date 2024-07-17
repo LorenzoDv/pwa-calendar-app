@@ -1,0 +1,175 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    margin-top: 150px;
+}
+
+.container .note {
+    width: 20%;
+    background-color: lightcoral;
+    padding: 15px;
+    border: 3px solid black;
+}
+
+.note h1 {
+    text-align: center;
+}
+
+.title {
+    text-align: center;
+}
+
+.container #calendar {
+    height: auto;
+    width: 80%;
+    padding: 15px;
+}
+
+form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+    margin-bottom: 50px;
+    gap: 25px;
+
+}
+
+.legende {
+    gap: 10px;
+    margin-top: 10px;
+    width: 400px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.legende-color {
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 11px;
+}
+
+.legende span {
+    display: block;
+    height: 30px;
+    width: 30px;
+}
+
+.color-picker {
+    display: flex;
+    gap: 10px;
+}
+
+.color-square {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.color-square.selected {
+    border: 2px solid black;
+}
+
+/* Style pour la modal */
+.modal {
+    display: none; /* Par défaut, la modal est cachée */
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Fond semi-transparent */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Style pour le formulaire à l'intérieur de la modal */
+#eventForm {
+    max-width: 100%;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.form-control {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.color-picker {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.color-square {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.color-square.selected {
+    border-width: 3px;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}

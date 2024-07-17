@@ -3,14 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="manifest" href="config/manifest.json">
     <title>My PWA</title>
+
+    <script src='assets/js/fullcalendar-6.1.15/dist/index.global.min.js'></script>
+
 </head>
 <body>
-<h1>My Progressive Web App</h1>
-<button id="saveDataButton">Save Data</button>
-<button id="loadDataButton">Load Data</button>
-<script src="script.js"></script>
+<h1 class="title">Calendrier Mimouche</h1>
+<div class="legende">
+    <div class="legende-color">
+        <span style="background-color: yellow;"></span>
+        <p>Botanique</p>
+    </div>
+    <div class="legende-color">
+        <span style="background-color: red;"></span>
+        <p>Santé</p>
+    </div>
+    <div class="legende-color">
+        <span style="background-color: green;"></span>
+        <p>Voiture</p>
+    </div>
+    <div class="legende-color">
+        <span style="background-color: blue;"></span>
+        <p>travail</p>
+    </div>
+    <div class="legende-color">
+        <span style="background-color: violet;"></span>
+        <p>Concert</p>
+    </div>
+    <div class="legende-color">
+        <span style="background-color: orange;"></span>
+        <p>Mimouche</p>
+    </div>
+</div>
+<!-- Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <form id="eventForm">
+            <div>
+                <label for="eventName">Event Name:</label>
+                <input type="text" class="form-control" placeholder="Enter event" id="eventName">
+            </div>
+            <div>
+                <label for="eventDescription">Description</label>
+                <textarea class="form-control" placeholder="Entrer description" id="eventDescription"
+                ></textarea>
+            </div>
+            <div>
+                <label for="fromDate">From:</label>
+                <input type="date" class="form-control" placeholder="Enter from date" id="fromDate">
+            </div>
+            <div>
+                <label for="toDate">To:</label>
+                <input type="date" class="form-control" id="toDate">
+            </div>
+
+            <div class="color-picker" id="colorPicker">
+                <div class="color-square selected" style="background-color: yellow;" data-color="#FFFF00"></div>
+                <div class="color-square" style="background-color: red;" data-color="#FF0000"></div>
+                <div class="color-square" style="background-color: green;" data-color="#008000"></div>
+                <div class="color-square" style="background-color: blue;" data-color="#0000FF"></div>
+                <div class="color-square" style="background-color: violet;" data-color="#EE82EE"></div>
+                <div class="color-square" style="background-color: orange;" data-color="#FFA500"></div>
+            </div>
+            <button type="button" class="btn btn-primary" id="addEvent">Add Event</button>
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="note">
+        <h1>Mes notes</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At corporis facere inventore nesciunt quis sint
+            voluptate. Commodi nostrum quo quos.</p>
+    </div>
+    <div id='calendar'></div>
+</div>
+
+
+<script src="assets/js/indexedDb.js"></script>
+<script src="assets/js/script.js"></script>
 </body>
 </html>

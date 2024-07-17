@@ -2,11 +2,12 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open('my-cache').then(cache => {
             return cache.addAll([
-                '/',
-                '/index.html',
-                '/styles.css',
-                '/script.js',
-                '/manifest.json'
+                '/pwa-app/',
+                '/pwa-app/index.html',
+                '/pwa-app/assets/css/style.css',
+                '/pwa-app/assets/js/script.js',
+                '/pwa-app/assets/js/indexedDb.js',
+                '/pwa-app/config/manifest.json'
             ]);
         })
     );
