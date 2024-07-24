@@ -185,3 +185,95 @@ body {
     justify-content: space-around;
     width: 100%;
 }
+
+
+.ce-toolbar__actions {
+    width: 750px !important;
+    right: -50px;
+}
+
+.ce-toolbar__settings-btn {
+    position: absolute;
+    right: 0;
+}
+
+.ce-settings {
+    position: absolute;
+    right: 0;
+}
+
+.ce-block__content {
+    background-color: lightgrey;
+}
+
+.ce-toolbar__plus {
+    display: none;
+}
+
+.draggable-box {
+    width: 150px;
+    height: 100px;
+    background-color: #f0f0f0;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: move;
+    text-align: center;
+}
+
+.draggable-box p {
+    margin: 0;
+}
+
+/* Style pour le bouton d'ajout de note */
+.add-note-btn {
+    font-size: 24px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Style pour la modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.note-item {
+    background-color: white;
+}

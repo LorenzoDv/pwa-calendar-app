@@ -8,7 +8,9 @@
     <title>My PWA</title>
 
     <script src='assets/js/fullcalendar-6.1.15/dist/index.global.min.js'></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
 </head>
 <body>
 <h1 class="title">Calendrier Mimouche</h1>
@@ -71,8 +73,7 @@
 
             <div class="desc-modal">
                 <label for="eventDescription">Description</label>
-                <textarea class="form-control" placeholder="Entrer description" id="eventDescription"
-                ></textarea>
+                <div id="editorjs"></div>
             </div>
 
         </form>
@@ -81,14 +82,79 @@
 <div class="container">
     <div class="note">
         <h1>Mes notes</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At corporis facere inventore nesciunt quis sint
-            voluptate. Commodi nostrum quo quos.</p>
+        <button id="addNoteBtn" class="add-note-btn">+</button>
+        <div id="notesList"></div> <!-- Conteneur pour afficher les notes -->
     </div>
-    <div id='calendar'></div>
+    <div id="calendar"></div>
+</div>
+<!-- Modal pour ajouter une note -->
+<!-- Modal pour ajouter une note -->
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <span id="closeNoteModal" class="close">&times;</span>
+        <h2>Ajouter une note</h2>
+        <form id="noteForm">
+            <label for="noteTitle">Titre:</label>
+            <input type="text" id="noteTitle" name="noteTitle" required>
+            <br>
+            <label for="noteContent">Contenu:</label>
+            <textarea id="noteContent" name="noteContent" rows="5" required></textarea>
+            <br>
+            <label for="noteColor">Couleur:</label>
+            <div class="color-picker" id="colorPickerNotes">
+                <div class="color-square selected" style="background-color: yellow;" data-color="#FFFF00"></div>
+                <div class="color-square" style="background-color: red;" data-color="#FF0000"></div>
+                <div class="color-square" style="background-color: green;" data-color="#008000"></div>
+                <div class="color-square" style="background-color: blue;" data-color="#0000FF"></div>
+                <div class="color-square" style="background-color: violet;" data-color="#EE82EE"></div>
+                <div class="color-square" style="background-color: orange;" data-color="#FFA500"></div>
+            </div>
+            <br>
+            <label for="noteStartDate">Date de début:</label>
+            <input type="date" id="noteStartDate" name="noteStartDate">
+            <br>
+            <label for="noteEndDate">Date de fin:</label>
+            <input type="date" id="noteEndDate" name="noteEndDate">
+            <br>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
 </div>
 
-
+<div id="editNoteModal" class="modal">
+    <div class="modal-content">
+        <span id="closeEditNoteModal" class="close">&times;</span>
+        <h2>Modifier une note</h2>
+        <form id="editNoteForm">
+            <input type="hidden" id="editNoteId">
+            <label for="editNoteTitle">Titre:</label>
+            <input type="text" id="editNoteTitle" name="editNoteTitle" required>
+            <br>
+            <label for="editNoteContent">Contenu:</label>
+            <textarea id="editNoteContent" name="editNoteContent" rows="5" required></textarea>
+            <br>
+            <label for="editNoteColor">Couleur:</label>
+            <div class="color-picker" id="editColorPicker">
+                <div class="color-square selected" style="background-color: yellow;" data-color="#FFFF00"></div>
+                <div class="color-square" style="background-color: red;" data-color="#FF0000"></div>
+                <div class="color-square" style="background-color: green;" data-color="#008000"></div>
+                <div class="color-square" style="background-color: blue;" data-color="#0000FF"></div>
+                <div class="color-square" style="background-color: violet;" data-color="#EE82EE"></div>
+                <div class="color-square" style="background-color: orange;" data-color="#FFA500"></div>
+            </div>
+            <br>
+            <label for="editNoteStartDate">Date de début:</label>
+            <input type="date" id="editNoteStartDate" name="editNoteStartDate">
+            <br>
+            <label for="editNoteEndDate">Date de fin:</label>
+            <input type="date" id="editNoteEndDate" name="editNoteEndDate">
+            <br>
+            <button type="submit">Modifier</button>
+        </form>
+    </div>
+</div>
 <script src="assets/js/indexedDb.js"></script>
 <script src="assets/js/script.js"></script>
+<script src="assets/js/noteDb.js"></script>
 </body>
 </html>
