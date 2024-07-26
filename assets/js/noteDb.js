@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     let db;
+    let editor;
     let selectedNoteId;
 
     // Ouvrir la base de données IndexedDB
-    const request = indexedDB.open('NotesDB', 1);
+    const request = indexedDB.open('NotesDB', 2);
 
     request.onerror = event => {
         console.error('Database error:', event.target.errorCode);
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Ajouter une note à IndexedDB
     function addNoteToDB(note) {
         const transaction = db.transaction(['notes'], 'readwrite');
         const store = transaction.objectStore('notes');
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         request.onsuccess = function () {
             console.log("Note added to IndexedDB");
-            loadNotesFromDB(); // Rafraîchir les notes après l'ajout
+            loadNotesFromDB();
         };
 
         request.onerror = function (e) {
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Mettre à jour une note dans IndexedDB
     function updateNoteInDB(note) {
         const transaction = db.transaction(['notes'], 'readwrite');
         const store = transaction.objectStore('notes');
@@ -52,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         request.onsuccess = function () {
             console.log("Note updated in IndexedDB");
-            loadNotesFromDB(); // Rafraîchir les notes après la mise à jour
+            loadNotesFromDB();
         };
 
         request.onerror = function (e) {
@@ -60,7 +59,21 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Charger les notes depuis IndexedDB
+    function deleteNoteFromDB(noteId) {
+        const transaction = db.transaction(['notes'], 'readwrite');
+        const store = transaction.objectStore('notes');
+        const request = store.delete(noteId);
+
+        request.onsuccess = function () {
+            console.log("Note deleted from IndexedDB");
+            loadNotesFromDB();
+        };
+
+        request.onerror = function (e) {
+            console.error("Error deleting note from IndexedDB", e);
+        };
+    }
+
     function loadNotesFromDB() {
         const transaction = db.transaction(['notes'], 'readonly');
         const store = transaction.objectStore('notes');
@@ -76,35 +89,60 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Afficher les notes dans le DOM
     function displayNotes(notes) {
-        const notesList = document.getElementById('notesList');
-        notesList.innerHTML = ''; // Vider la liste actuelle
+        const notesList = document.getElementById('external-events');
+        if (notesList) {
+            notesList.innerHTML = '';
 
-        notes.forEach(note => {
-            const noteElement = document.createElement('div');
-            noteElement.classList.add('note-item');
-            noteElement.style.backgroundColor = note.color; // Appliquer la couleur de fond
-            noteElement.dataset.id = note.id; // Ajouter l'ID de la note pour la modification
-            noteElement.innerHTML = `
-                <h3>${note.title}</h3>
-                <p>${note.content}</p>
-                <p><strong>Date de début:</strong> ${note.startDate || 'Non spécifiée'}</p>
-                <p><strong>Date de fin:</strong> ${note.endDate || 'Non spécifiée'}</p>
-            `;
-            notesList.appendChild(noteElement);
-        });
+            notes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.classList.add('note-item');
+                noteElement.style.backgroundColor = note.color;
+                noteElement.dataset.id = note.id;
+                noteElement.draggable = true; // Rendre les notes déplaçables
+                noteElement.innerHTML = `
+                    <h3>${note.title}</h3>
+                    <h3>${note.content}</h3>
+                    <p><strong>Date de début:</strong> ${note.startDate || 'Non spécifiée'}</p>
+                    <p><strong>Date de fin:</strong> ${note.endDate || 'Non spécifiée'}</p>
+                `;
+                notesList.appendChild(noteElement);
 
-        // Ajouter les gestionnaires de clic aux notes
-        document.querySelectorAll('.note-item').forEach(noteItem => {
-            noteItem.addEventListener('click', function () {
-                const noteId = parseInt(this.dataset.id, 10);
-                loadNoteForEdit(noteId);
+                // Ajouter l'événement dragstart
+                noteElement.addEventListener('dragstart', function (event) {
+                    event.dataTransfer.setData('text/plain', JSON.stringify(note));
+                });
             });
+
+            document.querySelectorAll('.note-item').forEach(noteItem => {
+                noteItem.addEventListener('click', function () {
+                    const noteId = parseInt(this.dataset.id, 10);
+                    loadNoteForEdit(noteId);
+                });
+            });
+        }
+    }
+
+    function initializeEditor(holderId, data = {}) {
+        if (editor) {
+            editor.destroy();
+        }
+        editor = new EditorJS({
+            holder: holderId,
+            tools: {
+                header: Header,
+                checklist: Checklist
+            },
+            data: data,
+            onReady: function () {
+                console.log(`Editor.js is ready for ${holderId}`);
+            },
+            onChange: function () {
+                console.log('Content changed in Editor.js');
+            }
         });
     }
 
-    // Charger une note pour modification
     function loadNoteForEdit(noteId) {
         const transaction = db.transaction(['notes'], 'readonly');
         const store = transaction.objectStore('notes');
@@ -114,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const note = event.target.result;
             if (note) {
                 populateEditModal(note);
+                selectedNoteId = note.id;
                 document.getElementById('editNoteModal').style.display = 'block';
             }
         };
@@ -123,15 +162,16 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Remplir la modal de modification avec les données de la note
     function populateEditModal(note) {
         document.getElementById('editNoteId').value = note.id;
         document.getElementById('editNoteTitle').value = note.title;
-        document.getElementById('editNoteContent').value = note.content;
+
+        const editorData = note.content ? JSON.parse(note.content) : {};
+        initializeEditor('editorjsEdit', editorData);
+
         document.getElementById('editNoteStartDate').value = note.startDate || '';
         document.getElementById('editNoteEndDate').value = note.endDate || '';
 
-        // Pré-sélectionner la couleur
         const colorSquares = document.querySelectorAll('#editColorPicker .color-square');
         colorSquares.forEach(square => {
             if (square.getAttribute('data-color') === note.color) {
@@ -142,49 +182,92 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Ajouter un gestionnaire de clic à la couleur pour la modal de modification
-    document.getElementById('editColorPicker').addEventListener('click', function (event) {
+    document.getElementById('addNoteBtn')?.addEventListener('click', function () {
+        document.getElementById('noteModal').style.display = 'block';
+        initializeEditor('editorjsAdd');
+    });
+
+    document.getElementById('closeNoteModal')?.addEventListener('click', function () {
+        document.getElementById('noteModal').style.display = 'none';
+    });
+
+    document.getElementById('closeEditNoteModal')?.addEventListener('click', function () {
+        document.getElementById('editNoteModal').style.display = 'none';
+    });
+
+    document.getElementById('editColorPicker')?.addEventListener('click', function (event) {
         if (event.target.classList.contains('color-square')) {
             document.querySelectorAll('#editColorPicker .color-square').forEach(square => square.classList.remove('selected'));
             event.target.classList.add('selected');
         }
     });
 
-    // Mettre à jour une note depuis le formulaire de modification
-    document.getElementById('editNoteForm').addEventListener('submit', function (event) {
+    document.getElementById('editNoteForm')?.addEventListener('submit', function (event) {
         event.preventDefault();
+        console.log('Edit form submitted');
+
         const noteId = parseInt(document.getElementById('editNoteId').value, 10);
         const title = document.getElementById('editNoteTitle').value;
-        const content = document.getElementById('editNoteContent').value;
         const color = document.querySelector('#editColorPicker .color-square.selected')?.getAttribute('data-color') || '#FFFF00';
         const startDate = document.getElementById('editNoteStartDate').value;
         const endDate = document.getElementById('editNoteEndDate').value;
 
-        const updatedNote = {
-            id: noteId,
-            title: title,
-            content: content,
-            color: color,
-            startDate: startDate,
-            endDate: endDate
-        };
+        editor.save().then((outputData) => {
+            console.log('Editor data saved:', outputData);
 
-        updateNoteInDB(updatedNote);
+            const updatedNote = {
+                id: noteId,
+                title: title,
+                content: JSON.stringify(outputData),
+                color: color,
+                startDate: startDate,
+                endDate: endDate
+            };
 
-        // Réinitialiser le formulaire et fermer la modal
-        document.getElementById('editNoteForm').reset();
-        document.querySelector('#editColorPicker .color-square.selected')?.classList.remove('selected');
-        document.getElementById('editNoteModal').style.display = 'none';
+            updateNoteInDB(updatedNote);
+
+            document.getElementById('editNoteForm').reset();
+            document.querySelector('#editColorPicker .color-square.selected')?.classList.remove('selected');
+            document.getElementById('editNoteModal').style.display = 'none';
+        }).catch((error) => {
+            console.error('Saving editor content failed:', error);
+        });
     });
 
-    // Fermer la modal de modification
-    document.getElementById('closeEditNoteModal').addEventListener('click', function () {
-        document.getElementById('editNoteModal').style.display = 'none';
-    });
-
-    window.addEventListener('click', function (event) {
-        if (event.target === document.getElementById('editNoteModal')) {
+    document.getElementById('deleteNoteBtn')?.addEventListener('click', function () {
+        if (selectedNoteId) {
+            deleteNoteFromDB(selectedNoteId);
             document.getElementById('editNoteModal').style.display = 'none';
         }
+    });
+
+    document.getElementById('noteForm')?.addEventListener('submit', function (event) {
+        event.preventDefault();
+        console.log('Add form submitted');
+
+        const title = document.getElementById('noteTitle').value;
+        const color = document.querySelector('#colorPickerNotes .color-square.selected')?.getAttribute('data-color') || '#FFFF00';
+        const startDate = document.getElementById('noteStartDate').value;
+        const endDate = document.getElementById('noteEndDate').value;
+
+        editor.save().then((outputData) => {
+            console.log('Editor data saved:', outputData);
+
+            const newNote = {
+                title: title,
+                content: JSON.stringify(outputData),
+                color: color,
+                startDate: startDate,
+                endDate: endDate
+            };
+
+            addNoteToDB(newNote);
+
+            document.getElementById('noteForm').reset();
+            document.querySelector('#colorPickerNotes .color-square.selected')?.classList.remove('selected');
+            document.getElementById('noteModal').style.display = 'none';
+        }).catch((error) => {
+            console.error('Saving editor content failed:', error);
+        });
     });
 });

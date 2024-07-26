@@ -95,13 +95,14 @@ document.addEventListener('DOMContentLoaded', function () {
             locale: 'fr',
             events: events,
             selectable: true,
+            droppable: true,
             select: function (info) {
                 // Créez un ID temporaire ou générez un ID unique
-                const tempId = new Date().getTime(); // Utilisez un timestamp comme ID temporaire
+                // Utilisez un timestamp comme ID temporaire
 
                 // Stockez les informations dans un objet événement avec un ID temporaire
                 const newEvent = {
-                    id: tempId,
+                    id: '',
                     title: '', // Rempli plus tard par l'utilisateur
                     desc: '', // Rempli plus tard par l'utilisateur
                     start: info.startStr,
@@ -111,13 +112,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Affichez le modal avec les dates sélectionnées
                 showModal(info.startStr, info.endStr || info.startStr, newEvent);
+                console.log('showModal')
 
-                console.log("Event selected:", newEvent);
             },
             eventClick: function (info) {
                 var event = info.event;
+                console.log('showModalForEdit')
                 showModalForEdit(event);
-                console.log("yo")
+
             },
             eventDidMount: function (info) {
                 var deleteIcon = document.createElement('span');
@@ -171,6 +173,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Afficher le modal pour ajouter ou modifier un événement
     function showModal(fromDate, toDate, newEvent = null) {
+
+        console.log(newEvent)
+
         var modal = document.getElementById('eventModal');
         modal.style.display = 'block';
         document.getElementById('fromDate').value = fromDate;
@@ -198,8 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Mettre à jour le bouton pour ajouter ou mettre à jour
             var addButton = document.getElementById('addEvent');
-            addButton.innerHTML = 'Update Event';
-            addButton.setAttribute('id', 'updateEvent');
+            addButton.innerHTML = 'Add Event';
+            addButton.setAttribute('id', 'addEvent');
             addButton.dataset.eventId = newEvent.id;
 
             addButton.removeEventListener('click', handleAddOrUpdateEvent);
@@ -261,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Afficher le modal pour éditer un événement
     function showModalForEdit(event) {
+
         var modal = document.getElementById('eventModal');
         modal.style.display = 'block';
 
@@ -270,7 +276,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Charger les données de l'éditeur
         const editorData = event.extendedProps.desc ? JSON.parse(event.extendedProps.desc) : {};
+
+
         initializeEditor(editorData);
+
 
         var colorSquares = document.querySelectorAll('.color-square');
         colorSquares.forEach(square => {
@@ -283,21 +292,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var addButton = document.getElementById('addEvent');
         addButton.innerHTML = 'Update Event';
-        addButton.setAttribute('id', 'updateEvent');
+        addButton.setAttribute('id', 'addEvent');
         addButton.dataset.eventId = event.id; // Ajouter l'ID de l'événement aux données du bouton
-
         addButton.removeEventListener('click', handleAddOrUpdateEvent);
         addButton.addEventListener('click', function (e) {
             e.preventDefault();
+
             saveEditorContent(event);
         });
     }
 
     // Sauvegarder le contenu de l'éditeur
     function saveEditorContent(event) {
+
+        const addButton = document.getElementById('addEvent');
+        let dataEventId = addButton.dataset.eventId || new Date().getTime();
+
         editor.save().then((outputData) => {
             const newEvent = {
-                id: event?.id || null, // Utilisez `null` si `event` n'est pas défini
+                id: Number(dataEventId),
                 title: document.getElementById('eventName').value,
                 desc: JSON.stringify(outputData), // Sauvegarder le contenu de l'éditeur en JSON
                 start: document.getElementById('fromDate').value,
@@ -306,6 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             console.log('Submitting event with editor content:', newEvent);
+
+
             handleAddOrUpdateEvent(newEvent);
         }).catch((error) => {
             console.error('Saving editor content failed:', error);
@@ -313,9 +328,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleAddOrUpdateEvent(event) {
-        console.log('Handling event:', event);
+
 
         if (isValidEvent(event)) {
+
+            console.log('-----------------yy----------------------------')
+            console.log(event.id)
+            console.log('-----------------yy----------------------------')
+
             if (event.id) {
                 console.log("Updating existing event with ID:", event.id);
                 updateEventInDB(event);

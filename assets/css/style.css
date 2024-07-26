@@ -79,7 +79,7 @@ body {
 .modal {
     display: none; /* Par défaut, la modal est cachée */
     position: fixed;
-    z-index: 2;
+    z-index: 2 !important;
     left: 0;
     top: 0;
     width: 100%;
@@ -276,4 +276,18 @@ body {
 
 .note-item {
     background-color: white;
+}
+
+/* Style pour l'icône de suppression dans le modal de modification */
+.delete-note-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.delete-note-btn:hover {
+    background-color: darkred;
 }
