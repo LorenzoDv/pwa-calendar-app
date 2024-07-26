@@ -89,22 +89,48 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+
+    function hexToRgb(hex) {
+        // Supprimer le '#' si présent
+        hex = hex.replace('#', '');
+
+        // Convertir les valeurs hexadécimales en décimales
+        let bigint = parseInt(hex, 16);
+        let r = (bigint >> 16) & 255;
+        let g = (bigint >> 8) & 255;
+        let b = bigint & 255;
+
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function convertRGBtoRGBA(rgb, alpha) {
+        let hexVoncerted = hexToRgb(rgb)
+        let result = hexVoncerted.replace('rgb', 'rgba').replace(')', `, ${alpha})`);
+        return result;
+    }
+
     function displayNotes(notes) {
         const notesList = document.getElementById('external-events');
         if (notesList) {
             notesList.innerHTML = '';
 
             notes.forEach(note => {
+                console.log(note)
                 const noteElement = document.createElement('div');
+                let rgbColor = note.color; // e.g., "rgb(255, 0, 0)"
+                let rgbaColor = convertRGBtoRGBA(rgbColor, 0.2);
                 noteElement.classList.add('note-item');
-                noteElement.style.backgroundColor = note.color;
+                noteElement.style.backgroundColor = rgbaColor;
                 noteElement.dataset.id = note.id;
                 noteElement.draggable = true; // Rendre les notes déplaçables
                 noteElement.innerHTML = `
-                    <h3>${note.title}</h3>
-                    <h3>${note.content}</h3>
-                    <p><strong>Date de début:</strong> ${note.startDate || 'Non spécifiée'}</p>
-                    <p><strong>Date de fin:</strong> ${note.endDate || 'Non spécifiée'}</p>
+                            <div class="note-list">
+                             <span style="background-color: ${note.color}"></span>
+                                                <h1>${note.title}</h1>
+                            </div>
+                   <h3>${note.content}</h3>
+              <p style="display: none"><strong>Date de début:</strong> ${note.startDate || 'Non spécifiée'}</p>
+                <p style="display: none"><strong>Date de fin:</strong> ${note.endDate || 'Non spécifiée'}</p>
                 `;
                 notesList.appendChild(noteElement);
 

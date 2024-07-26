@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="manifest" href="config/manifest.json">
     <title>My PWA</title>
 
@@ -18,26 +19,43 @@
     <div class="legende-color">
         <span style="background-color: yellow;"></span>
         <p>Botanique</p>
+
     </div>
     <div class="legende-color">
         <span style="background-color: red;"></span>
         <p>Santé</p>
+
     </div>
     <div class="legende-color">
         <span style="background-color: green;"></span>
         <p>Voiture</p>
+
     </div>
     <div class="legende-color">
         <span style="background-color: blue;"></span>
         <p>travail</p>
+
     </div>
     <div class="legende-color">
         <span style="background-color: violet;"></span>
         <p>Concert</p>
+
     </div>
     <div class="legende-color">
         <span style="background-color: orange;"></span>
         <p>Mimouche</p>
+
+    </div>
+    <button onclick="openModal()">Modifier</button>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Modifier les noms des couleurs</h2>
+        <div id="modalFormContainer"></div>
+        <button onclick="saveAllChanges()">Enregistrer les modifications</button>
     </div>
 </div>
 <!-- Modal -->
@@ -45,6 +63,7 @@
     <div class="modal-content">
         <span id="closeModal" class="close">&times;</span>
         <form id="eventForm">
+            <span id="deleteEvent"><i class="fa-solid fa-trash-can"></i></span>
             <div class="top-modal">
                 <div>
                     <label for="eventName">Event Name:</label>
@@ -81,12 +100,12 @@
 </div>
 <div class="container">
     <div class="note">
-        <h1>Mes notes</h1>
-        <button id="addNoteBtn" class="add-note-btn">+</button>
-        <div id="external-events">
-          
+        <div class="">
+            <h1>Mes notes</h1>
+            <button id="addNoteBtn" class="add-note-btn">+</button>
         </div>
-        !-- Conteneur pour afficher les notes -->
+        <div id="external-events">
+        </div>
     </div>
     <div id="calendar"></div>
 </div>
@@ -161,6 +180,7 @@
 </div>
 <script src="assets/js/noteDb.js"></script>
 <script src="assets/js/indexedDb.js"></script>
+<script src="assets/js/colorDb.js"></script>
 <script src="assets/js/script.js"></script>
 
 </body>

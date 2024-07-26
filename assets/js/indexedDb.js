@@ -87,6 +87,45 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+
+    let containerEl = document.getElementById('external-events');
+    new FullCalendar.Draggable(containerEl, {
+        itemSelector: '.note-item',
+        eventData: function (eventEl) {
+            let title = eventEl.querySelector('h1').innerText;
+            let desc = eventEl.querySelector('h3').innerText;
+            let start = eventEl.querySelector('p:nth-of-type(1)').innerText.split(': ')[1];
+            let end = eventEl.querySelector('p:nth-of-type(2)').innerText.split(': ')[1];
+            let color = eventEl.style.backgroundColor;
+
+            return {
+                title: title,
+                desc: desc,
+                start: start,
+                end: end,
+                backgroundColor: color
+            };
+        }
+    });
+
+
+    function rgbaToRgb(rgba) {
+        // Extraire les valeurs numériques de la chaîne rgba
+        const rgbaValues = rgba.match(/\d+/g);
+
+        if (rgbaValues && rgbaValues.length >= 3) {
+            const r = rgbaValues[0];
+            const g = rgbaValues[1];
+            const b = rgbaValues[2];
+
+            // Retourner la chaîne rgb sans la valeur alpha
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Si la chaîne rgba n'est pas valide, retourner une chaîne vide ou une couleur par défaut
+        return '';
+    }
+
     // Initialiser le calendrier avec les événements
     function initializeCalendar(events) {
         var calendarEl = document.getElementById('calendar');
@@ -96,11 +135,25 @@ document.addEventListener('DOMContentLoaded', function () {
             events: events,
             selectable: true,
             droppable: true,
+            editable: true, // Permet de déplacer les événements
+            drop: function (info) {
+                let event = info.draggedEl;
+                const rgbColor = rgbaToRgb(event.style.backgroundColor);
+            
+                let newEvent = {
+                    title: event.querySelector('h1').innerText,
+                    desc: event.querySelector('h3').innerText,
+                    start: info.dateStr,
+                    end: info.dateStr, // Ajustez si nécessaire
+                    color: rgbColor
+                };
+                addEventToDB(newEvent); // Ajouter l'événement à la base de données
+            },
+            eventReceive: function (info) {
+                // Cette fonction est appelée quand un événement est reçu dans le calendrier
+                console.log('Event received:', info.event);
+            },
             select: function (info) {
-                // Créez un ID temporaire ou générez un ID unique
-                // Utilisez un timestamp comme ID temporaire
-
-                // Stockez les informations dans un objet événement avec un ID temporaire
                 const newEvent = {
                     id: '',
                     title: '', // Rempli plus tard par l'utilisateur
@@ -110,45 +163,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     color: '#000000' // Valeur par défaut
                 };
 
-                // Affichez le modal avec les dates sélectionnées
                 showModal(info.startStr, info.endStr || info.startStr, newEvent);
-                console.log('showModal')
-
             },
             eventClick: function (info) {
                 var event = info.event;
-                console.log('showModalForEdit')
                 showModalForEdit(event);
-
             },
-            eventDidMount: function (info) {
-                var deleteIcon = document.createElement('span');
-                deleteIcon.classList.add('delete-event');
-                deleteIcon.innerHTML = '&times;';
-                info.el.appendChild(deleteIcon);
-
-                deleteIcon.addEventListener('click', function () {
-                    if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
-                        var eventToRemove = info.event;
-                        var eventId = Number(eventToRemove.id); // Convertir l'ID en nombre
-                        removeEventFromDB(eventId);
-                        eventToRemove.remove();
-                        calendar.refetchEvents();
-                    }
-                });
-            }
         });
 
         calendar.render();
-
-        var addButton = document.getElementById('addEvent');
-        if (addButton) {
-            addButton.addEventListener('click', function (e) {
-                e.preventDefault();
-                handleAddOrUpdateEvent(); // Passer l'événement ici si nécessaire
-            });
-        }
     }
+
 
     // Initialiser Editor.js
     function initializeEditor(data = {}) {
@@ -266,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Afficher le modal pour éditer un événement
     function showModalForEdit(event) {
-
         var modal = document.getElementById('eventModal');
         modal.style.display = 'block';
 
@@ -276,10 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Charger les données de l'éditeur
         const editorData = event.extendedProps.desc ? JSON.parse(event.extendedProps.desc) : {};
-
-
         initializeEditor(editorData);
-
 
         var colorSquares = document.querySelectorAll('.color-square');
         colorSquares.forEach(square => {
@@ -297,10 +318,21 @@ document.addEventListener('DOMContentLoaded', function () {
         addButton.removeEventListener('click', handleAddOrUpdateEvent);
         addButton.addEventListener('click', function (e) {
             e.preventDefault();
-
             saveEditorContent(event);
         });
+
+        // Configurer le bouton de suppression
+        var deleteButton = document.getElementById('deleteEvent');
+        deleteButton.addEventListener('click', function () {
+            if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
+                var eventId = Number(event.id);
+                removeEventFromDB(eventId);
+                calendar.getEventById(eventId).remove();
+                closeModal();
+            }
+        });
     }
+
 
     // Sauvegarder le contenu de l'éditeur
     function saveEditorContent(event) {

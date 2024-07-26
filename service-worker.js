@@ -8,6 +8,7 @@ self.addEventListener('install', event => {
                 '/pwa-app/assets/js/script.js',
                 '/pwa-app/assets/js/indexedDb.js',
                 '/pwa-app/assets/js/nodeDb.js',
+                '/pwa-app/assets/js/colorDb.js',
                 '/pwa-app/config/manifest.json'
             ]);
         })
